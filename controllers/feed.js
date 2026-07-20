@@ -54,7 +54,7 @@ exports.createPost = (req, res, next) => {
     }
     const title = req.body.title
     const content = req.body.content
-    const imageUrl = req.file.path.replace(/\\/g, '/');
+    const imageUrl = 'images/' + req.file.filename
 
 
     User.findByPk(req.userId)
@@ -90,7 +90,6 @@ exports.getPost = (req, res, next) => {
                 error.statusCode = 404
                 throw error;
             }
-            console.log(result, "POSTS MIL GAYE")
             res.status(200).json({
                 message: 'Post retrieved Successfully',
                 post: result
@@ -119,7 +118,7 @@ exports.updatePost = (req, res, next) => {
     let imageUrl = req.body.image
 
     if (req.file) {
-        imageUrl = req.file.path.replace(/\\/g, '/');
+        imageUrl = 'images/' + req.file.filename
     }
 
     if (!imageUrl) {
