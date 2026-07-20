@@ -210,7 +210,6 @@ class Feed extends Component {
         return res.json();
       })
       .then(resData => {
-        console.log(resData);
         this.setState(prevState => {
           const updatedPosts = prevState.posts.filter(p => p.id !== postId);
           return { posts: updatedPosts, postsLoading: false };
