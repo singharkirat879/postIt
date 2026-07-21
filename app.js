@@ -38,8 +38,19 @@ const storage = new CloudinaryStorage({
 });
 
 
-
-app.use(multer({ storage}).single('image'))
+app.use((req, res, next) => {
+    multer({ storage }).single("image")(req, res, err => {
+        if (err) {
+            console.error("========== MULTER ERROR ==========");
+            console.error(err);
+            console.error("Name:", err.name);
+            console.error("Message:", err.message);
+            console.error("Stack:", err.stack);
+            return res.status(500).json(err);
+        }
+        next();
+    });
+});
 
 app.use('/feed', feedRoutes);
 app.use('/auth', authRoutes)
