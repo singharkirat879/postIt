@@ -1,6 +1,22 @@
+require('dotenv').config();
+
+// ── Startup env-var sanity check (visible in Render logs) ──
+const REQUIRED_ENV = [
+    'CLOUDINARY_CLOUD_NAME',
+    'CLOUDINARY_API_KEY',
+    'CLOUDINARY_API_SECRET',
+    'JWT_SECRET',
+    'DB_NAME', 'DB_USER', 'DB_PASSWORD', 'DB_HOST', 'DB_PORT'
+];
+REQUIRED_ENV.forEach(key => {
+    if (!process.env[key]) {
+        console.error(`❌ MISSING ENV VAR: ${key}`);
+    } else {
+        console.log(`✅ ${key} is set (length: ${process.env[key].length})`);
+    }
+});
 
 const express = require('express')
-require('dotenv').config();
 const app = express()
 const bodyParser = require('body-parser')
 const feedRoutes = require('./routes/feed');
@@ -10,7 +26,7 @@ const Post = require('./models/post')
 const User = require('./models/user')
 const multer = require('multer')
 const cloudinary = require('./util/cloudinary');
-const { CloudinaryStorage } = require('multer-storage-cloudinary');
+const CloudinaryStorage = require('./util/cloudinary-storage');
 
 
 const PORT = process.env.PORT || 8000
@@ -25,16 +41,8 @@ app.use((req, res, next) => {
 app.use(bodyParser.json())
 
 const storage = new CloudinaryStorage({
-    cloudinary,
-    params: async (req, file) => {
-        console.log("Cloudinary config check:");
-        console.log(cloudinary.config());
-
-        return {
-            folder: "postit",
-            allowed_formats: ["jpg", "jpeg", "png", "webp"]
-        };
-    }
+    folder: 'postit',
+    allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
 });
 
 
