@@ -172,7 +172,7 @@ class Feed extends Component {
             );
             updatedPosts[postIndex] = post;
           } else if (prevState.posts.length < POSTS_PER_PAGE) {
-            updatedPosts = prevState.posts.concat(post);
+            updatedPosts = [post, ...prevState.posts];
           }
           return {
             posts: updatedPosts,
