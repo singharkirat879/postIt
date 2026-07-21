@@ -14,7 +14,7 @@ exports.getPosts = (req, res, next) => {
             return Post.findAll({
                 limit: ITEMS_PER_PAGE,
                 offset: (currentPage - 1) * ITEMS_PER_PAGE,
-                order: [['id', 'DESC']]
+                order: [['createdAt', 'DESC']]
             })
         })
         .then(result => {
