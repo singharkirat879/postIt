@@ -13,7 +13,8 @@ exports.getPosts = (req, res, next) => {
             totalItems = numPosts;
             return Post.findAll({
                 limit: ITEMS_PER_PAGE,
-                offset: (currentPage - 1) * ITEMS_PER_PAGE
+                offset: (currentPage - 1) * ITEMS_PER_PAGE,
+                order: [['id', 'DESC']]
             })
         })
         .then(result => {
