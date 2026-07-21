@@ -6,4 +6,7 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
+console.log("TYPE:", typeof process.env.CLOUDINARY_API_KEY);
+console.log("LEN:", process.env.CLOUDINARY_API_KEY?.length);
+console.log("KEY:", JSON.stringify(process.env.CLOUDINARY_API_KEY));
 module.exports = cloudinary;
