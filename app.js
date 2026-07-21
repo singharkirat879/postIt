@@ -1,3 +1,4 @@
+
 const express = require('express')
 require('dotenv').config();
 const app = express()
@@ -13,7 +14,6 @@ const { CloudinaryStorage } = require('multer-storage-cloudinary');
 
 
 const PORT = process.env.PORT || 8000
-
 
 app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', process.env.CLIENT_ORIGIN || '*')
@@ -39,16 +39,7 @@ const storage = new CloudinaryStorage({
 
 
 
-app.use((req, res, next) => {
-    multer({ storage }).single("image")(req, res, err => {
-        if (err) {
-            console.error("MULTER ERROR:");
-            console.error(err);
-            return res.status(500).json({ message: err.message });
-        }
-        next();
-    });
-});
+app.use(multer({ storage}).single('image'))
 
 app.use('/feed', feedRoutes);
 app.use('/auth', authRoutes)
