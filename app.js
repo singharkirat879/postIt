@@ -27,22 +27,12 @@ const storage = new CloudinaryStorage({
     cloudinary,
     params: {
         folder: "postit",
-        allowed_formats: ["jpg", "jpeg", "png"]
+        allowed_formats: ["jpg", "jpeg", "png", "webp"]
     }
 });
 
-const fileFilter = (req, file, cb) => {
-    if (file.mimetype === 'image/png' ||
-        file.mimetype === 'image/jpg' ||
-        file.mimetype === 'image/jpeg'
-    ) {
-        cb(null, true)
-    } else {
-        cb(null, false)
-    }
-}
 
-app.use(multer({ storage, fileFilter }).single('image'))
+app.use(multer({ storage}).single('image'))
 
 app.use('/feed', feedRoutes);
 app.use('/auth', authRoutes)
