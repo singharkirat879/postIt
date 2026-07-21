@@ -55,7 +55,10 @@ exports.createPost = (req, res, next) => {
     const title = req.body.title
     const content = req.body.content
     const imageUrl = req.file.path
+
     const imagePublicId = req.file.filename;
+
+    console.log(req.file, "REQ>FILE IS PRINTING")
 
 
     User.findByPk(req.userId)
@@ -174,13 +177,15 @@ const clearImage = async (publicId) => {
     if (!publicId) return;
 
     try {
-        await cloudinary.uploader.destroy(publicId);
-        console.log("Deleted:", publicId);
+        console.log("Deleting:", publicId);
+        const result = await cloudinary.uploader.destroy(publicId);
+        console.log(result);
     } catch (err) {
-        console.log(err);
+        console.error("FULL ERROR:");
+        console.error(err);
+        console.error(err.stack);
     }
 };
-
 exports.deletePost = (req, res, next) => {
     const postId = req.params.postId
 

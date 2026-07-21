@@ -25,9 +25,14 @@ app.use(bodyParser.json())
 
 const storage = new CloudinaryStorage({
     cloudinary,
-    params: {
-        folder: "postit",
-        allowed_formats: ["jpg", "jpeg", "png", "webp"]
+    params: async (req, file) => {
+        console.log("Cloudinary config check:");
+        console.log(cloudinary.config());
+
+        return {
+            folder: "postit",
+            allowed_formats: ["jpg", "jpeg", "png", "webp"]
+        };
     }
 });
 
