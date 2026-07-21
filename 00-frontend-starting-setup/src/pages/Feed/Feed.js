@@ -67,6 +67,7 @@ class Feed extends Component {
         return res.json();
       })
       .then(resData => {
+        window.location.reload();
         this.setState({
           posts: resData.posts.map(post => {
             return {
