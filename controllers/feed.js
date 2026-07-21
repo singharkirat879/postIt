@@ -129,20 +129,20 @@ exports.updatePost = (req, res, next) => {
     Post.findByPk(postId)
         .then(async post => {
             // console.log(post.userId, "Updating Post")
+            
             let imagePublicId = post.imagePublicId;
-
             if (!post) {
                 const error = new Error('Post not found')
                 error.statusCode = 404;
                 throw error;
             }
-
+            
             if (String(req.userId) !== String(post.userId)) {
                 const error = new Error('Not authorized');
                 error.statusCode = 403;
                 throw error;
             }
-
+            
             if (req.file) {
                 await clearImage(post.imagePublicId)
                 imageUrl = req.file.path;
