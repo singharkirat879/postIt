@@ -16,6 +16,10 @@ const Post = sequelize.define('post', {
         type: Sequelize.STRING,
         allowNull: false
     },
+    imagePublicId: {
+        type: Sequelize.STRING,
+        allowNull: false
+    },
     content: {
         type: Sequelize.STRING,
         allowNull: false

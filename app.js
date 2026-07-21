@@ -8,17 +8,11 @@ const sequelize = require('./util/db')
 const Post = require('./models/post')
 const User = require('./models/user')
 const multer = require('multer')
-const { v4: uuidv4 } = require('uuid')
-const path = require('path')
-const fs = require('fs')
+const cloudinary = require('./util/cloudinary');
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
 
 const PORT = process.env.PORT || 8000
 
-const imagesDir = path.join(__dirname, 'images');
-
-if (!fs.existsSync(imagesDir)) {
-    fs.mkdirSync(imagesDir);
-}
 
 app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', process.env.CLIENT_ORIGIN || '*')
@@ -29,14 +23,13 @@ app.use((req, res, next) => {
 
 app.use(bodyParser.json())
 
-const diskStorage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, imagesDir)
-    },
-    filename: (req, file, cb) => {
-        cb(null, uuidv4() + path.extname(file.originalname))
+const storage = new CloudinaryStorage({
+    cloudinary,
+    params: {
+        folder: "postit",
+        allowed_formats: ["jpg", "jpeg", "png"]
     }
-})
+});
 
 const fileFilter = (req, file, cb) => {
     if (file.mimetype === 'image/png' ||
@@ -49,8 +42,7 @@ const fileFilter = (req, file, cb) => {
     }
 }
 
-app.use(multer({ storage: diskStorage, fileFilter: fileFilter }).single('image'))
-app.use('/images', express.static(path.join(__dirname, 'images')))
+app.use(multer({ storage, fileFilter }).single('image'))
 
 app.use('/feed', feedRoutes);
 app.use('/auth', authRoutes)
@@ -68,7 +60,7 @@ app.use((error, req, res, next) => {
 User.hasMany(Post)
 Post.belongsTo(User)
 
-sequelize.sync()
+sequelize.sync({alter: true})
     .then(() => {
         app.listen(PORT, () => {
             console.log(`Server running on port ${PORT}`)

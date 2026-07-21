@@ -1,8 +1,7 @@
 const { validationResult } = require('express-validator')
 const Post = require('../models/post')
-const fs = require('fs')
-const path = require('path')
 const User = require('../models/user')
+const cloudinary = require('../util/cloudinary');
 
 let ITEMS_PER_PAGE = 2;
 
@@ -54,7 +53,8 @@ exports.createPost = (req, res, next) => {
     }
     const title = req.body.title
     const content = req.body.content
-    const imageUrl = 'images/' + req.file.filename
+    const imageUrl = req.file.path
+    const imagePublicId = req.file.filename;
 
 
     User.findByPk(req.userId)
@@ -63,6 +63,7 @@ exports.createPost = (req, res, next) => {
                 title: title,
                 content: content,
                 imageUrl: imageUrl,
+                imagePublicId: imagePublicId,   
                 creator: { name: user.name }
             })
         })
@@ -115,11 +116,8 @@ exports.updatePost = (req, res, next) => {
     const postId = req.params.postId;
     const title = req.body.title
     const content = req.body.content
-    let imageUrl = req.body.image
+    let imageUrl = req.body.image;
 
-    if (req.file) {
-        imageUrl = 'images/' + req.file.filename
-    }
 
     if (!imageUrl) {
         const error = new Error('Choose a file')
@@ -128,8 +126,9 @@ exports.updatePost = (req, res, next) => {
     }
 
     Post.findByPk(postId)
-        .then(post => {
+        .then(async post => {
             // console.log(post.userId, "Updating Post")
+            let imagePublicId = post.imagePublicId;
 
             if (!post) {
                 const error = new Error('Post not found')
@@ -143,13 +142,16 @@ exports.updatePost = (req, res, next) => {
                 throw error;
             }
 
-            if (imageUrl !== post.imageUrl) {
-                clearImage(post.imageUrl)
+            if (req.file) {
+                await clearImage(post.imagePublicId)
+                imageUrl = req.file.path;
+                imagePublicId = req.file.filename;
             }
 
             post.title = title
             post.imageUrl = imageUrl
             post.content = content
+            post.imagePublicId = imagePublicId
 
             return post.save()
         })
@@ -167,26 +169,22 @@ exports.updatePost = (req, res, next) => {
         })
 }
 
-const clearImage = filePath => {
+const clearImage = async (publicId) => {
+    if (!publicId) return;
 
-    if (!filePath) {
-        return;
+    try {
+        await cloudinary.uploader.destroy(publicId);
+        console.log("Deleted:", publicId);
+    } catch (err) {
+        console.log(err);
     }
-
-    filePath = path.join(__dirname, '..', filePath);
-
-    fs.unlink(filePath, err => {
-        if (err) {
-            console.log(err);
-        }
-    });
-}
+};
 
 exports.deletePost = (req, res, next) => {
     const postId = req.params.postId
 
     Post.findByPk(postId)
-        .then(post => {
+        .then(async post => {
             console.log(post, "Delting this post")
             if (!post) {
                 const error = new Error('Post not found :(')
@@ -199,7 +197,7 @@ exports.deletePost = (req, res, next) => {
                 error.statusCode = 403;
                 throw error;
             }
-            clearImage(post.imageUrl)
+            await clearImage(post.imagePublicId);
 
             return post.destroy()
         })
