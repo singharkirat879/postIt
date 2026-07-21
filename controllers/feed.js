@@ -40,6 +40,10 @@ exports.getPosts = (req, res, next) => {
 exports.createPost = (req, res, next) => {
     const errors = validationResult(req)
 
+    console.log("Reached createPost");
+    console.log("req.file =", req.file);
+
+
     if (!errors.isEmpty()) {
         console.log(errors, "VALIDATION ERROR IN CREATING POST MAYBE DUE TO TITLE AND CONTENT VALIDATION")
         const error = new Error('Validation Failed!')
@@ -83,7 +87,7 @@ exports.createPost = (req, res, next) => {
             }
             next(err)
         })
-}
+    }
 
 exports.getPost = (req, res, next) => {
     const postId = req.params.postId;

@@ -11,6 +11,7 @@ const multer = require('multer')
 const cloudinary = require('./util/cloudinary');
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
 
+
 const PORT = process.env.PORT || 8000
 
 
@@ -37,21 +38,28 @@ const storage = new CloudinaryStorage({
 });
 
 
-app.use(multer({ storage}).single('image'))
+
+app.use((req, res, next) => {
+    multer({ storage }).single("image")(req, res, err => {
+        if (err) {
+            console.error("MULTER ERROR:");
+            console.error(err);
+            return res.status(500).json({ message: err.message });
+        }
+        next();
+    });
+});
 
 app.use('/feed', feedRoutes);
 app.use('/auth', authRoutes)
 
-app.use((error, req, res, next) => {
-    console.log(error);
-    const status = error.statusCode || 500
-    const message = error.message
-    const data = error.data
-    res.status(status).json({
-        message: message,
-        data: data
-    })
-})
+app.use((err, req, res, next) => {
+    console.error("========== FULL ERROR ==========");
+    console.error(err);
+    console.error(err.stack);
+    next(err);
+});
+
 User.hasMany(Post)
 Post.belongsTo(User)
 
