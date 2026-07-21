@@ -3,7 +3,7 @@ const Post = require('../models/post')
 const User = require('../models/user')
 const cloudinary = require('../util/cloudinary');
 
-let ITEMS_PER_PAGE = 2;
+let ITEMS_PER_PAGE = 10;
 
 exports.getPosts = (req, res, next) => {
     let currentPage = +req.query.page || 1;
