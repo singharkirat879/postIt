@@ -67,7 +67,6 @@ class Feed extends Component {
         return res.json();
       })
       .then(resData => {
-        window.location.reload();
         this.setState({
           posts: resData.posts.map(post => {
             return {
@@ -157,6 +156,7 @@ class Feed extends Component {
         return res.json();
       })
       .then(resData => {
+        window.location.reload();
         const post = {
           id: resData.post.id,
           title: resData.post.title,
@@ -213,6 +213,7 @@ class Feed extends Component {
         return res.json();
       })
       .then(resData => {
+        window.location.reload();
         this.setState(prevState => {
           const updatedPosts = prevState.posts.filter(p => p.id !== postId);
           return { posts: updatedPosts, postsLoading: false };
