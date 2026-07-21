@@ -9,6 +9,8 @@ import Loader from '../../components/Loader/Loader';
 import ErrorHandler from '../../components/ErrorHandler/ErrorHandler';
 import './Feed.css';
 
+const POSTS_PER_PAGE = 10;
+
 class Feed extends Component {
   state = {
     isEditing: false,
@@ -169,7 +171,7 @@ class Feed extends Component {
               p => p.id === prevState.editPost.id
             );
             updatedPosts[postIndex] = post;
-          } else if (prevState.posts.length < 2) {
+          } else if (prevState.posts.length < POSTS_PER_PAGE) {
             updatedPosts = prevState.posts.concat(post);
           }
           return {
@@ -272,7 +274,7 @@ class Feed extends Component {
             <Paginator
               onPrevious={this.loadPosts.bind(this, 'previous')}
               onNext={this.loadPosts.bind(this, 'next')}
-              lastPage={Math.ceil(this.state.totalPosts / 2)}
+              lastPage={Math.ceil(this.state.totalPosts / POSTS_PER_PAGE)}
               currentPage={this.state.postPage}
             >
               {this.state.posts.map(post => (
