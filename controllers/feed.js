@@ -28,8 +28,6 @@ exports.getPosts = (req, res, next) => {
                 posts: result,
                 totalItems: totalItems,
             })
-
-            page.reload();
         })
         .catch(err => {
             if (!err.statusCode) {
