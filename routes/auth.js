@@ -8,9 +8,9 @@ router.post('/signup',
     [
         body('email').isEmail().withMessage('Please enter a valid email.').normalizeEmail(),
         body('name').isLength({ min: 6 }),
-        body('password', 'Your password must be at least 8 characters and should incldue a combination of uppercase letters, lowercase letters, and numbers.')
+        body('password', 'Your password must be at least 8 characters and should incldue a combination of uppercase letters, lowercase letters, numbers and special characters[@$!%*?&].')
             .isLength({ min: 8 }).matches(
-                /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,20}$/
+                /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,20}$/
             )
     ],
     authController.postSignup)
