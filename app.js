@@ -65,7 +65,7 @@ app.use((error, req, res, next) => {
 User.hasMany(Post)
 Post.belongsTo(User)
 
-sequelize.sync({ force: true })
+sequelize.sync()
     .then(() => {
         app.listen(PORT, () => {
             console.log(`Server running on port ${PORT}`)
