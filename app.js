@@ -1,5 +1,6 @@
-const express = require('express')
 require('dotenv').config();
+const express = require('express')
+const cors = require('cors');
 const app = express()
 const bodyParser = require('body-parser')
 const feedRoutes = require('./routes/feed');
@@ -14,12 +15,26 @@ const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const PORT = process.env.PORT || 8000
 
 
-app.use((req, res, next) => {
-    res.setHeader('Access-Control-Allow-Origin', process.env.CLIENT_ORIGIN || '*')
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, PUT, PATCH')
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization')
-    next();
-})
+const ALLOWED_ORIGINS = (
+    process.env.CLIENT_ORIGINS ||
+    "https://post-it-beta.vercel.app,http://localhost:8000")
+    .split(',').map(origin => origin.trim())
+
+app.use(cors({
+    origin: (origin, callback) => {
+
+        if (!origin) {
+            return callback(null, true);
+        }
+        if (ALLOWED_ORIGINS.includes(origin)) {
+            return callback(null, true);
+        }
+        callback(new Error(`CORS: origin '${origin}' not allowed`));
+    },
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true
+}));
 
 app.use(bodyParser.json())
 
@@ -32,7 +47,7 @@ const storage = new CloudinaryStorage({
 });
 
 
-app.use(multer({ storage}).single('image'))
+app.use(multer({ storage }).single('image'))
 
 app.use('/feed', feedRoutes);
 app.use('/auth', authRoutes)

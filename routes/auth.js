@@ -8,17 +8,19 @@ router.post('/signup',
     [
         body('email').isEmail().withMessage('Please enter a valid email.').normalizeEmail(),
         body('name').isLength({ min: 6 }),
-        body('password', 'Please enter a password with only numbers and text and at least 6 characters')
-            .isLength({ min: 6 })
-            .isAlphanumeric().trim()
+        body('password', 'Your password must be at least 8 characters and should incldue a combination of uppercase letters, lowercase letters, and numbers.')
+            .isLength({ min: 8 }).matches(
+                /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,20}$/
+            )
     ],
     authController.postSignup)
 
 router.post('/login', [
     body('email').isEmail().withMessage('Please enter a valid email.').normalizeEmail(),
-    body('password', 'Please enter a password with only numbers and text and at least 6 characters')
-        .isLength({ min: 6 })
-        .isAlphanumeric().trim()
+    body('password', 'Your password must be at least 8 characters and should incldue a combination of uppercase letters, lowercase letters, numbers and special characters[@$!%*?&].')
+        .isLength({ min: 8 }).matches(
+            /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,20}$/
+        )
 ], authController.postLogin)
 
 router.get('/status', isAuth, authController.getStatus);
@@ -27,4 +29,4 @@ router.patch('/status', isAuth, [
     body('status').trim().not().isEmpty()
 ], authController.updateStatus);
 
-module.exports = router;
+module.exports = router;

@@ -70,12 +70,13 @@ class App extends Component {
       })
     })
       .then(res => {
-        if (res.status === 422) {
-          throw new Error("Email Should have '@' and proper domain. And password should be of atleast 6 characters");
-        }
         return res.json().then(resData => {
-          if (res.status !== 200 && res.status !== 201) {
-            const error = new Error(resData.message || 'Could not authenticate you!');
+          if (!res.ok) {
+            const msg =
+              (resData.data && resData.data[0] && resData.data[0].msg) ||
+              resData.message ||
+              'Could not authenticate you!';
+            const error = new Error(msg);
             error.statusCode = res.status;
             throw error;
           }
@@ -123,16 +124,18 @@ class App extends Component {
       })
     })
       .then(res => {
-        if (res.status === 422) {
-          throw new Error(
-            "Validation failed. Make sure the email address isn't used yet!"
-          );
-        }
-        if (res.status !== 200 && res.status !== 201) {
-          console.log('Error!');
-          throw new Error('Creating a user failed!');
-        }
-        return res.json();
+        return res.json().then(resData => {
+          if (!res.ok) {
+            const msg =
+              (resData.data && resData.data[0] && resData.data[0].msg) ||
+              resData.message ||
+              'Creating a user failed!';
+            const error = new Error(msg);
+            error.statusCode = res.status;
+            throw error;
+          }
+          return resData;
+        });
       })
       .then(resData => {
         console.log(resData);
