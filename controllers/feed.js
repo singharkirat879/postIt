@@ -3,7 +3,7 @@ const Post = require('../models/post')
 const User = require('../models/user')
 const cloudinary = require('../util/cloudinary');
 
-let ITEMS_PER_PAGE = 10;
+let ITEMS_PER_PAGE = 5;
 
 exports.getPosts = (req, res, next) => {
     let currentPage = +req.query.page || 1;
@@ -38,9 +38,6 @@ exports.getPosts = (req, res, next) => {
 }
 
 exports.createPost = (req, res, next) => {
-    console.log("Reached createPost");
-    console.log("req.file =", req.file);
-    
     const errors = validationResult(req)
 
     if (!errors.isEmpty()) {
@@ -58,10 +55,7 @@ exports.createPost = (req, res, next) => {
     const title = req.body.title
     const content = req.body.content
     const imageUrl = req.file.path
-
     const imagePublicId = req.file.filename;
-
-    console.log(req.file, "REQ>FILE IS PRINTING")
 
 
     User.findByPk(req.userId)
@@ -70,7 +64,7 @@ exports.createPost = (req, res, next) => {
                 title: title,
                 content: content,
                 imageUrl: imageUrl,
-                imagePublicId: imagePublicId,   
+                imagePublicId: imagePublicId,
                 creator: { name: user.name }
             })
         })
@@ -86,7 +80,7 @@ exports.createPost = (req, res, next) => {
             }
             next(err)
         })
-    }
+}
 
 exports.getPost = (req, res, next) => {
     const postId = req.params.postId;
@@ -135,20 +129,20 @@ exports.updatePost = (req, res, next) => {
     Post.findByPk(postId)
         .then(async post => {
             // console.log(post.userId, "Updating Post")
-            
             let imagePublicId = post.imagePublicId;
+
             if (!post) {
                 const error = new Error('Post not found')
                 error.statusCode = 404;
                 throw error;
             }
-            
+
             if (String(req.userId) !== String(post.userId)) {
                 const error = new Error('Not authorized');
                 error.statusCode = 403;
                 throw error;
             }
-            
+
             if (req.file) {
                 await clearImage(post.imagePublicId)
                 imageUrl = req.file.path;
@@ -180,15 +174,13 @@ const clearImage = async (publicId) => {
     if (!publicId) return;
 
     try {
-        console.log("Deleting:", publicId);
-        const result = await cloudinary.uploader.destroy(publicId);
-        console.log(result);
+        await cloudinary.uploader.destroy(publicId);
+        console.log("Deleted:", publicId);
     } catch (err) {
-        console.error("FULL ERROR:");
-        console.error(err);
-        console.error(err.stack);
+        console.log(err);
     }
 };
+
 exports.deletePost = (req, res, next) => {
     const postId = req.params.postId
 
